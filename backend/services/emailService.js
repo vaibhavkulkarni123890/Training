@@ -201,7 +201,7 @@ const sendEmail = async (to, subject, html, attachments = []) => {
         }
 
         // All methods failed
-        console.error(`🚨 CRITICAL: All email methods failed for: ${to}`);
+        console.error(`� CReITICAL: All email methods failed for: ${to}`);
         console.log(`📧 Subject: ${subject}`);
         console.log(`⚠️ This email needs manual follow-up!`);
         console.log(`💡 Consider setting up EmailJS or Formspree for reliable email delivery`);
@@ -216,10 +216,15 @@ const sendEmail = async (to, subject, html, attachments = []) => {
 const sendProjectSelectionEmail = async (user, project) => {
     // Always send in-app notification
     await sendProjectSelectionNotification(user, project);
+    
+    // Send push notification to device
+    if (user.notificationPreferences?.push !== false) {
+        await sendProjectSelectionPush(user, project);
+    }
 
     // Only send email if enabled
-    if (!EMAIL_ENABLED) {
-        console.log('📱 In-app notification sent instead of email for project selection');
+    if (!EMAIL_ENABLED || user.notificationPreferences?.email === false) {
+        console.log('📱 Device notifications sent instead of email for project selection');
         return;
     }
 
@@ -259,10 +264,15 @@ const sendProjectSelectionEmail = async (user, project) => {
 const sendOfferLetterEmail = async (user, project) => {
     // Always send in-app notification
     await sendOfferLetterNotification(user, project);
+    
+    // Send push notification to device
+    if (user.notificationPreferences?.push !== false) {
+        await sendOfferLetterPush(user, project);
+    }
 
     // Only send email if enabled
-    if (!EMAIL_ENABLED) {
-        console.log('📱 In-app notification sent instead of email for offer letter');
+    if (!EMAIL_ENABLED || user.notificationPreferences?.email === false) {
+        console.log('📱 Device notifications sent instead of email for offer letter');
         return;
     }
 
@@ -285,10 +295,15 @@ const sendOfferLetterEmail = async (user, project) => {
 const sendCertificateEmail = async (user, project) => {
     // Always send in-app notification
     await sendCertificateNotification(user, project);
+    
+    // Send push notification to device
+    if (user.notificationPreferences?.push !== false) {
+        await sendCertificatePush(user, project);
+    }
 
     // Only send email if enabled
-    if (!EMAIL_ENABLED) {
-        console.log('📱 In-app notification sent instead of email for certificate');
+    if (!EMAIL_ENABLED || user.notificationPreferences?.email === false) {
+        console.log('📱 Device notifications sent instead of email for certificate');
         return;
     }
 
@@ -340,7 +355,7 @@ const startEmailReminders = () => {
                 if (diff > 6 * 24 * 60 * 60 * 1000) {
                     // Always send in-app notification (unlimited)
                     await sendWeeklyReminderNotification(user);
-
+                    
                     // Send push notification to device (unlimited)
                     if (user.notificationPreferences?.push !== false) {
                         await sendWeeklyReminderPush(user);
