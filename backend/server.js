@@ -6,12 +6,9 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-console.log('--- STARTING SERVER ---');
 dotenv.config();
-console.log('Env variables loaded');
 
 const app = express();
-console.log('Express app initialized');
 
 // ─── Security Middleware ───────────────────────────────────────
 app.use(helmet());
@@ -31,30 +28,22 @@ app.use(limiter);
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
-console.log('Body parsing middleware applied.');
 
-// ─── Static Files (documents & uploads) ────────────────────────
-console.log('Setting up static file serving...');
 app.use('/documents', express.static(path.join(__dirname, 'documents')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-console.log('Static file serving configured.');
 
 // ─── Routes ────────────────────────────────────────────────────
-console.log('Loading routes...');
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/submissions', require('./routes/projects'));  // plagiarism submissions
-console.log('Routes loaded');
 
 // ─── Health Check ──────────────────────────────────────────────
-console.log('Setting up health check endpoint...');
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
-console.log('Health check endpoint configured.');
 
 const { startEmailReminders } = require('./services/emailService');
 
