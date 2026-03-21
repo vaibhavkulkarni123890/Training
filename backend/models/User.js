@@ -36,6 +36,19 @@ const UserSchema = new mongoose.Schema({
     enrollmentDate: { type: Date, default: Date.now },
     weeklySubmissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Report' }],
     
+    // Notification Preferences
+    pushSubscription: {
+        endpoint: String,
+        keys: {
+            p256dh: String,
+            auth: String
+        }
+    },
+    notificationPreferences: {
+        push: { type: Boolean, default: true },
+        email: { type: Boolean, default: false }
+    },
+    
     // Referral System
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },

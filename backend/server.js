@@ -39,6 +39,8 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/submissions', require('./routes/projects'));  // plagiarism submissions
+app.use('/api/notifications', require('./routes/notifications')); // notification system
+app.use('/api/push', require('./routes/pushNotifications')); // push notifications
 
 // ─── Health Check ──────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
