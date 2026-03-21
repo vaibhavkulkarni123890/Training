@@ -50,10 +50,20 @@ const { startEmailReminders } = require('./services/emailService');
 
 const PORT = process.env.PORT || 5000;
 
+if (!process.env.MONGODB_URI) {
+    console.error('❌ MONGODB_URI is not defined in environment variables!');
+    process.exit(1);
+}
+
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log('MongoDB Connected');
+        console.log('✅ MongoDB Connected');
         startEmailReminders();
-        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+        console.error('❌ MongoDB Connection Error:', err.message);
+        // On Render, we want to keep the process alive long enough to see the logs
+        // But if we can't connect, we can't really function.
+        process.exit(1);
+    });

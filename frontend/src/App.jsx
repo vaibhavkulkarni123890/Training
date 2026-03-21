@@ -80,7 +80,7 @@ const Navbar = () => {
 
 const App = () => {
     return (
-        <Router>
+        <Router basename="/training">
             <Navbar />
             <Routes>
                 <Route path="/" element={<Home />} />
