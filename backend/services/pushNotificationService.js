@@ -3,15 +3,26 @@ const User = require('../models/User');
 
 // Configure web-push with VAPID keys
 const VAPID_KEYS = {
-    publicKey: process.env.VAPID_PUBLIC_KEY || 'BEl62iUYgUivxIkv69yViEuiBIa40HcCWLx6Q67_2e2sZFBjKcfABRX9rlNWNzSHBfMjBkqPwqNdVkbJGGt6DJM',
-    privateKey: process.env.VAPID_PRIVATE_KEY || 'VCqfP5YQb3_FWh2Cp4AELEw-4QIDAQAB'
+    publicKey: process.env.VAPID_PUBLIC_KEY || '',
+    privateKey: process.env.VAPID_PRIVATE_KEY || ''
 };
 
-webpush.setVapidDetails(
-    'mailto:' + (process.env.EMAIL_USER || 'contact@threatviper.com'),
-    VAPID_KEYS.publicKey,
-    VAPID_KEYS.privateKey
-);
+// Only configure VAPID if keys are provided
+if (VAPID_KEYS.publicKey && VAPID_KEYS.privateKey) {
+    try {
+        webpush.setVapidDetails(
+            'mailto:' + (process.env.EMAIL_USER || 'contact@threatviper.com'),
+            VAPID_KEYS.publicKey,
+            VAPID_KEYS.privateKey
+        );
+        console.log('✅ VAPID keys configured successfully');
+    } catch (error) {
+        console.error('❌ VAPID configuration error:', error.message);
+        console.log('💡 Push notifications will be disabled');
+    }
+} else {
+    console.log('⚠️ VAPID keys not configured - push notifications disabled');
+}
 
 // Store push subscription for a user
 const subscribeToPush = async (userId, subscription) => {
@@ -30,6 +41,12 @@ const subscribeToPush = async (userId, subscription) => {
 // Send push notification to a user
 const sendPushNotification = async (userId, payload) => {
     try {
+        // Check if VAPID is configured
+        if (!VAPID_KEYS.publicKey || !VAPID_KEYS.privateKey) {
+            console.log(`📱 Push notifications not configured - skipping for user: ${userId}`);
+            return false;
+        }
+
         const user = await User.findById(userId);
         if (!user || !user.pushSubscription) {
             console.log(`📱 No push subscription found for user: ${userId}`);

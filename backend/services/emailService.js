@@ -216,7 +216,7 @@ const sendEmail = async (to, subject, html, attachments = []) => {
 const sendProjectSelectionEmail = async (user, project) => {
     // Always send in-app notification
     await sendProjectSelectionNotification(user, project);
-    
+
     // Send push notification to device
     if (user.notificationPreferences?.push !== false) {
         await sendProjectSelectionPush(user, project);
@@ -264,7 +264,7 @@ const sendProjectSelectionEmail = async (user, project) => {
 const sendOfferLetterEmail = async (user, project) => {
     // Always send in-app notification
     await sendOfferLetterNotification(user, project);
-    
+
     // Send push notification to device
     if (user.notificationPreferences?.push !== false) {
         await sendOfferLetterPush(user, project);
@@ -295,7 +295,7 @@ const sendOfferLetterEmail = async (user, project) => {
 const sendCertificateEmail = async (user, project) => {
     // Always send in-app notification
     await sendCertificateNotification(user, project);
-    
+
     // Send push notification to device
     if (user.notificationPreferences?.push !== false) {
         await sendCertificatePush(user, project);
@@ -355,7 +355,7 @@ const startEmailReminders = () => {
                 if (diff > 6 * 24 * 60 * 60 * 1000) {
                     // Always send in-app notification (unlimited)
                     await sendWeeklyReminderNotification(user);
-                    
+
                     // Send push notification to device (unlimited)
                     if (user.notificationPreferences?.push !== false) {
                         await sendWeeklyReminderPush(user);
