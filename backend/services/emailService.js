@@ -1,6 +1,8 @@
+console.log('--- LOADING EMAIL SERVICE ---');
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
+console.log('EmailService dependencies loaded');
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
