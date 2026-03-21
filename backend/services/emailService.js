@@ -25,9 +25,36 @@ const fallbackTransporter = nodemailer.createTransport({
     port: 587,
     secure: false, // false for 587
     family: 4, // Force IPv4
-    connectionTimeout: 10000,
-    greetingTimeout: 5000,
-    socketTimeout: 10000,
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+
+// Gmail fallback (in case Hostinger is blocked)
+const gmailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER || process.env.EMAIL_USER,
+        pass: process.env.GMAIL_PASS || process.env.EMAIL_PASS
+    }
+});
+
+// Alternative port 2525 (often unblocked on hosting providers)
+const alternativeTransporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: 2525,
+    secure: false,
+    family: 4,
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
@@ -44,7 +71,7 @@ const sendEmail = async (to, subject, html, attachments = []) => {
             console.log(`[EMAIL PLACEHOLDER] To: ${to}, Subject: ${subject}`);
             return;
         }
-        
+
         const mailOptions = {
             from: `"TVP IT Solutions" <${process.env.EMAIL_USER}>`,
             to,
@@ -52,31 +79,52 @@ const sendEmail = async (to, subject, html, attachments = []) => {
             html,
             attachments
         };
-        
-        try {
-            // Try primary transporter first (port 465)
-            await transporter.verify();
-            await transporter.sendMail(mailOptions);
-            console.log(`Email sent successfully to: ${to} (via port 465)`);
-        } catch (primaryError) {
-            console.log(`Primary transporter failed, trying fallback (port 587)...`);
-            console.log(`Primary error: ${primaryError.message}`);
-            
-            // Try fallback transporter (port 587)
-            await fallbackTransporter.verify();
-            await fallbackTransporter.sendMail(mailOptions);
-            console.log(`Email sent successfully to: ${to} (via port 587)`);
+
+        // Try multiple transporters in order
+        const transporters = [
+            { name: 'Primary (465)', transporter: transporter },
+            { name: 'Fallback (587)', transporter: fallbackTransporter },
+            { name: 'Alternative (2525)', transporter: alternativeTransporter }
+        ];
+
+        // Add Gmail as fallback if we have Gmail credentials
+        if (process.env.GMAIL_USER || process.env.EMAIL_USER.includes('gmail.com')) {
+            transporters.push({ name: 'Gmail', transporter: gmailTransporter });
         }
-        
+
+        let lastError;
+
+        for (const { name, transporter: currentTransporter } of transporters) {
+            try {
+                console.log(`Trying ${name} transporter...`);
+                await currentTransporter.verify();
+                await currentTransporter.sendMail(mailOptions);
+                console.log(`Email sent successfully to: ${to} (via ${name})`);
+                return; // Success, exit function
+            } catch (error) {
+                console.log(`${name} transporter failed: ${error.message}`);
+                lastError = error;
+                continue; // Try next transporter
+            }
+        }
+
+        // If we get here, all transporters failed
+        throw lastError;
+
     } catch (err) {
-        console.error('Email send error (both transporters failed):', err.message);
+        console.error('Email send error (all transporters failed):', err.message);
         console.error('Full error details:', {
             code: err.code,
             command: err.command,
             response: err.response,
             responseCode: err.responseCode
         });
-        
+
+        // Log suggestion for debugging
+        if (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED') {
+            console.log('SUGGESTION: Your hosting provider may be blocking SMTP ports. Consider using a service like SendGrid, Mailgun, or enabling Gmail App Passwords.');
+        }
+
         // Don't throw the error to prevent breaking the application
         // Just log it for debugging
     }
