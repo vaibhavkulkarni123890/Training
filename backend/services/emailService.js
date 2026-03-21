@@ -6,9 +6,34 @@ const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: process.env.SMTP_PORT || 465,
     secure: true, // true for 465, false for 587
+    family: 4, // Force IPv4
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 5000, // 5 seconds
+    socketTimeout: 10000, // 10 seconds
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // Accept self-signed certificates
+    }
+});
+
+// Fallback transporter for port 587 with STARTTLS
+const fallbackTransporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: 587,
+    secure: false, // false for 587
+    family: 4, // Force IPv4
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -19,15 +44,41 @@ const sendEmail = async (to, subject, html, attachments = []) => {
             console.log(`[EMAIL PLACEHOLDER] To: ${to}, Subject: ${subject}`);
             return;
         }
-        await transporter.sendMail({
+        
+        const mailOptions = {
             from: `"TVP IT Solutions" <${process.env.EMAIL_USER}>`,
             to,
             subject,
             html,
             attachments
-        });
+        };
+        
+        try {
+            // Try primary transporter first (port 465)
+            await transporter.verify();
+            await transporter.sendMail(mailOptions);
+            console.log(`Email sent successfully to: ${to} (via port 465)`);
+        } catch (primaryError) {
+            console.log(`Primary transporter failed, trying fallback (port 587)...`);
+            console.log(`Primary error: ${primaryError.message}`);
+            
+            // Try fallback transporter (port 587)
+            await fallbackTransporter.verify();
+            await fallbackTransporter.sendMail(mailOptions);
+            console.log(`Email sent successfully to: ${to} (via port 587)`);
+        }
+        
     } catch (err) {
-        console.error('Email send error:', err.message);
+        console.error('Email send error (both transporters failed):', err.message);
+        console.error('Full error details:', {
+            code: err.code,
+            command: err.command,
+            response: err.response,
+            responseCode: err.responseCode
+        });
+        
+        // Don't throw the error to prevent breaking the application
+        // Just log it for debugging
     }
 };
 
