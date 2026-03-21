@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVP IT Solutions | Internship & Performance Certification</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --secondary: #64748b;
+            --dark: #0f172a;
+            --white: #ffffff;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-gradient: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            background-color: var(--white);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            padding: 6rem 0;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .text-gradient {
+            background: var(--text-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .navbar .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1.75rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-outline {
+            background: var(--white);
+            color: var(--dark);
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            padding-top: 10rem;
+            padding-bottom: 6rem;
+            background: radial-gradient(circle at top right, #e0f2fe 0%, #ffffff 100%);
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        .hero-image-wrap {
+            position: relative;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* Features */
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            background: var(--white);
+            border: 1px solid #f1f5f9;
+            border-radius: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .icon-box {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Mentorship Section */
+        .mentorship-section {
+            background: #f8fafc;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .advantage-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .advantage-item i {
+            color: var(--success);
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .price-card {
+            position: relative;
+            background: var(--white);
+            border: 2px solid #f1f5f9;
+            border-radius: 2rem;
+            padding: 3rem;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .price-card.popular {
+            border-color: var(--primary);
+            box-shadow: var(--card-shadow);
+        }
+
+        .price-tag {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .price-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-card ul {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .price-card li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--secondary);
+        }
+
+        /* College Section */
+        .college-banner {
+            background: var(--dark);
+            color: var(--white);
+            border-radius: 3rem;
+            padding: 5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .college-banner h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .college-banner p {
+            color: #94a3b8;
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+
+            .hero-grid,
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.75rem;
+            }
+
+            .grid-3,
+            .grid-4,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-grid {
+                max-width: 400px;
+            }
+
+            .hero,
+            .section {
+                padding: 4rem 0;
+            }
+
+            .college-banner {
+                padding: 3rem 1.5rem;
+            }
+        }
+
+        /* Animations */
+        [data-aos] {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        [data-aos].aos-animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .floating {
+            animation: floating 4s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo">
+                <i data-lucide="shield-check" size="24"></i>
+                TVP IT Solutions
+            </a>
+            <div class="nav-links">
+                <a href="#why-mentorship">Why Mentorship</a>
+                <a href="#programs">Programs</a>
+                <a href="#benefits">Benefits</a>
+                <a href="mailto:contact@threatviper.com" class="btn btn-primary">Enroll via Email</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+        <div class="container hero-grid">
+            <div data-aos>
+                <span class="badge">GROWTH-MINDSET: 2026 COHORT</span>
+                <h1>Build the Grit of <span class="text-gradient">Self-Directed Success</span></h1>
+                <p>The most valuable skill in tech isn't knowing a framework—it's the ability to learn independently.
+                    Join an internship designed to forge your autonomy, with expert mentorship available exactly when
+                    you need it.</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="mailto:contact@threatviper.com?subject=Self-Learning Internship Inquiry"
+                        class="btn btn-primary">
+                        Start Your Journey <i data-lucide="zap"></i>
+                    </a>
+                    <a href="#philosophy" class="btn btn-outline">Our Philosophy</a>
+                </div>
+            </div>
+            <div class="hero-image-wrap floating" data-aos>
+                <div class="glass-card">
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56"></div>
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e"></div>
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f"></div>
+                    </div>
+                    <code style="font-family: 'Courier New', monospace; color: var(--dark); font-size: 0.9rem;">
+                        <span style="color: var(--primary)">// The Self-Learning Loop</span><br>
+                        while (challengeExist) {<br>
+                        &nbsp;&nbsp;attemptSolution(); <span style="color: var(--secondary)">// Priority #1</span><br>
+                        &nbsp;&nbsp;researchDocumentation();<br><br>
+                        &nbsp;&nbsp;if (criticalBlocker) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;requestExpertReview(); <span style="color: var(--primary)">// Mentorship on Demand</span><br>
+                        &nbsp;&nbsp;}<br>
+                        }
+                    </code>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Philosophy -->
+    <section id="philosophy" class="section mentorship-section">
+        <div class="container comparison-grid">
+            <div data-aos>
+                <h2 style="font-size: 3rem; margin-bottom: 2rem;">Self-Learning is <span class="text-gradient">True
+                        Mastery</span></h2>
+                <p style="margin-bottom: 2rem; color: var(--secondary); font-size: 1.1rem;">In the professional world,
+                    there are no step-by-step tutorials. Success depends on your ability to navigate ambiguity. Our
+                    program is built on the belief that **Self-Learning is the most valuable asset** you can develop
+                    during your internship.</p>
+
+                <div class="glass-card"
+                    style="background: var(--white); border-left: 6px solid var(--primary); margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <i data-lucide="cpu" class="text-primary"></i> The On-Demand Support
+                    </h3>
+                    <p style="font-size: 0.95rem; color: var(--secondary);">We don't hold your hand. We let you lead the
+                        project. Mentorship is our strategic safety net—available only when your own research reaches a
+                        limit. This ensures you build "Solution Grit"—the difference between a junior and a senior
+                        engineer.</p>
+                </div>
+
+                <div class="advantage-item">
+                    <i data-lucide="check-circle-2"></i>
+                    <div><strong>Deep Independence: Learn to solve, not just follow.</strong></div>
+                </div>
+                <div class="advantage-item">
+                    <i data-lucide="check-circle-2"></i>
+                    <div><strong>Project Accountability: Own your code from day one.</strong></div>
+                </div>
+                <div class="advantage-item">
+                    <i data-lucide="check-circle-2"></i>
+                    <div><strong>Mentorship Safety Net: Expert intervention when required.</strong></div>
+                </div>
+            </div>
+            <div style="grid-column: span 1;" data-aos>
+                <div class="feature-card" style="background: var(--primary); color: white; margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">The 70-20-10 Principle</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.9;">70% of learning comes from **experience and practice**,
+                        20% from **social learning (peers/mentors)**, and 10% from **formal training**. We optimize for
+                        the 70%.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="rocket" size="32" class="text-primary" style="margin-bottom: 1rem;"></i>
+                    <h4>Future-Proofing</h4>
+                    <p style="font-size: 0.85rem; color: var(--secondary);">By mastering the art of self-learning today,
+                        you ensure you'll never be obsolete tomorrow, regardless of how technology shifts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs -->
+    <section id="programs" class="section">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 4rem;" data-aos>
+                <h2 style="font-size: 3rem;">Focus & <span class="text-gradient">Execution</span></h2>
+                <p style="color: var(--secondary); max-width: 600px; margin: 1rem auto 0;">Structured self-paced
+                    internships with professional validation and situational support.</p>
+            </div>
+
+            <!-- Software Dev -->
+            <div style="margin-bottom: 5rem;" data-aos>
+                <h3 style="margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem;">
+                    <div class="icon-box" style="margin: 0;"><i data-lucide="code"></i></div>
+                    Autonomous Software Development
+                </h3>
+                <div class="pricing-grid">
+                    <div class="price-card">
+                        <span class="badge">INTERMEDIATE</span>
+                        <h3>3 Months Program</h3>
+                        <div class="price-tag">₹4000</div>
+                        <p style="color: var(--secondary); font-size: 0.9rem;">Building high-performance web apps with
+                            React & Node.</p>
+                        <ul>
+                            <li><i data-lucide="check" size="16"></i> Weekly Analysis Reports</li>
+                            <li><i data-lucide="check" size="16"></i> Plagiarism Verification</li>
+                            <li><i data-lucide="check" size="16"></i> Mentorship Support</li>
+                            <li><i data-lucide="check" size="16"></i> Performance Certificate</li>
+                        </ul>
+                        <a href="mailto:contact@threatviper.com?subject=Software Dev 3 Months Program Inquiry"
+                            class="btn btn-outline" style="width: 100%; justify-content: center;">Inquire Now</a>
+                    </div>
+                    <div class="price-card popular">
+                        <span class="badge" style="background: var(--primary); color: white;">EXPERT</span>
+                        <h3>6 Months Program</h3>
+                        <div class="price-tag">₹7000</div>
+                        <p style="color: var(--secondary); font-size: 0.9rem;">Mastering Full-Stack Engineering,
+                            Architecture & DevOps.</p>
+                        <ul>
+                            <li><i data-lucide="check" size="16"></i> Full Portfolio Projects</li>
+                            <li><i data-lucide="check" size="16"></i> Advanced Code Reviews</li>
+                            <li><i data-lucide="check" size="16"></i> Weekly Performance Analysis</li>
+                            <li><i data-lucide="check" size="16"></i> Industry Certification</li>
+                        </ul>
+                        <a href="mailto:contact@threatviper.com?subject=Software Dev 6 Months Program Inquiry"
+                            class="btn btn-primary" style="width: 100%; justify-content: center;">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other categories listed simply for brevity as per user request -->
+            <div class="grid grid-2" data-aos>
+                <div class="glass-card" style="padding: 2rem;">
+                    <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i
+                            data-lucide="shield" class="text-primary"></i> Cybersecurity Program</h4>
+                    <p style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">From Network Security
+                        foundations to advanced Ethical Hacking.</p>
+                    <div style="font-weight: 800; color: var(--primary); margin-bottom: 1rem;">Start from ₹4000 / 3
+                        Months</div>
+                    <a href="mailto:contact@threatviper.com?subject=Cybersecurity Inquiry" class="btn btn-outline"
+                        style="padding: 0.5rem 1rem; font-size: 0.85rem;">Get Details</a>
+                </div>
+                <div class="glass-card" style="padding: 2rem;">
+                    <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i
+                            data-lucide="database" class="text-primary"></i> Data Science Program</h4>
+                    <p style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Data analysis,
+                        visualization, and production-ready Machine Learning.</p>
+                    <div style="font-weight: 800; color: var(--primary); margin-bottom: 1rem;">Start from ₹4000 / 3
+                        Months</div>
+                    <a href="mailto:contact@threatviper.com?subject=Data Science Inquiry" class="btn btn-outline"
+                        style="padding: 0.5rem 1rem; font-size: 0.85rem;">Get Details</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits -->
+    <section id="benefits" class="section">
+        <div class="container">
+            <div data-aos class="text-center" style="margin-bottom: 4rem;">
+                <h2 style="font-size: 3rem;">What Every <span class="text-gradient">Student Gets</span></h2>
+            </div>
+            <div class="grid grid-4" data-aos>
+                <div class="feature-card">
+                    <div class="icon-box"><i data-lucide="award"></i></div>
+                    <h4>Industry Certification</h4>
+                    <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 1rem;">Verification of your
+                        skills that employers actually trust.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i data-lucide="trending-up"></i></div>
+                    <h4>Weekly Analytics</h4>
+                    <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 1rem;">Automated checking for
+                        plagiarism and performance scores.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i data-lucide="zap"></i></div>
+                    <h4>Mentorship</h4>
+                    <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 1rem;">Expert guidance triggered
+                        when you encounter real-world blockers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i data-lucide="file-text"></i></div>
+                    <h4>Performance Score</h4>
+                    <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 1rem;">Measurable proof of your
+                        technical and consistency metrics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Colleges -->
+    <section class="section">
+        <div class="container" data-aos>
+            <div class="college-banner">
+                <h2>For Colleges & Universities</h2>
+                <p>Are you looking to provide professional-grade internships for your students? We offer tailored bulk
+                    programs with specialized administrative tracking for faculty.</p>
+                <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="mailto:contact@threatviper.com?subject=College Partnership Inquiry" class="btn btn-primary"
+                        style="background: var(--white); color: var(--dark);">Partner With Us</a>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700;">
+                        Contact: contact@threatviper.com
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: #ffffff; padding: 4rem 0; border-top: 1px solid #f1f5f9;">
+        <div class="container text-center">
+            <p style="color: var(--secondary); font-weight: 600;">&copy; 2026 TVP IT Solutions. A ThreatViper Networks
+                Initiative.</p>
+            <div style="margin-top: 1rem; color: var(--primary); font-weight: 800;">threatviper.com/training</div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Reveal on Scroll JS
+        const aosElements = document.querySelectorAll('[data-aos]');
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('aos-animate');
+                }
+            });
+        }, observerOptions);
+
+        aosElements.forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

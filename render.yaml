@@ -1,0 +1,32 @@
+services:
+  # ─── BACKEND SERVICE ──────────────────────────────────────────
+  - type: web
+    name: tvp-backend
+    env: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false # Set this in Render Dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://tvp-training.onrender.com # Update after frontend is live
+      - key: NODE_ENV
+        value: production
+
+  # ─── FRONTEND SERVICE ─────────────────────────────────────────
+  - type: web
+    name: tvp-frontend
+    runtime: static
+    plan: free
+    region: singapore
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://tvp-backend.onrender.com # Update with your actual backend URL
