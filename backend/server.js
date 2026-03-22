@@ -10,6 +10,9 @@ dotenv.config();
 
 const app = express();
 
+// ─── Trust Proxy for Render/Production ─────────────────────────
+app.set('trust proxy', 1); // Trust first proxy (required for Render)
+
 // ─── Security Middleware ───────────────────────────────────────
 app.use(helmet());
 app.use(cors({
