@@ -3,7 +3,10 @@ const path = require('path');
 
 // Ensure documents directory exists
 const docsDir = path.join(__dirname, '..', 'documents');
-if (!fs.existsSync(docsDir)) fs.mkdirSync(docsDir, { recursive: true });
+if (!fs.existsSync(docsDir)) {
+    fs.mkdirSync(docsDir, { recursive: true });
+    console.log('📁 Created documents directory');
+}
 
 /**
  * Generate an offer letter HTML file for a user who selected a project

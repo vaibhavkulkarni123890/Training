@@ -184,4 +184,57 @@ router.post('/advance-week', auth, async (req, res) => {
     }
 });
 
+// POST /regenerate-documents — Regenerate missing offer letter/certificate
+router.post('/regenerate-documents', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate('selectedProject');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        
+        if (!user.selectedProject) {
+            return res.status(400).json({ error: 'No project selected' });
+        }
+
+        const project = user.selectedProject;
+        const results = {};
+
+        // Regenerate offer letter if user has selected a project
+        if (user.selectedProject && user.paymentStatus === 'paid') {
+            try {
+                const offerLetterPath = await generateOfferLetter(user, project);
+                user.offerLetterUrl = offerLetterPath;
+                results.offerLetter = offerLetterPath;
+                console.log(`✅ Regenerated offer letter for user: ${user.email}`);
+            } catch (err) {
+                console.error('Offer letter regeneration error:', err.message);
+                results.offerLetterError = err.message;
+            }
+        }
+
+        // Regenerate certificate if course is completed
+        if (user.courseCompleted) {
+            try {
+                const { generateCertificate } = require('../services/documentService');
+                const certificatePath = await generateCertificate(user, project);
+                user.certificateUrl = certificatePath;
+                results.certificate = certificatePath;
+                console.log(`✅ Regenerated certificate for user: ${user.email}`);
+            } catch (err) {
+                console.error('Certificate regeneration error:', err.message);
+                results.certificateError = err.message;
+            }
+        }
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'Documents regenerated successfully',
+            results
+        });
+    } catch (err) {
+        console.error('Document regeneration error:', err.message);
+        res.status(500).json({ error: 'Failed to regenerate documents' });
+    }
+});
+
 module.exports = router;

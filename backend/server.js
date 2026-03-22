@@ -35,6 +35,31 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use('/documents', express.static(path.join(__dirname, 'documents')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Handle document download with better error handling
+app.get('/documents/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filepath = path.join(__dirname, 'documents', filename);
+    
+    // Check if file exists
+    if (!require('fs').existsSync(filepath)) {
+        console.error(`❌ Document not found: ${filename}`);
+        return res.status(404).json({ 
+            error: 'Document not found',
+            message: 'The requested document may have been moved or deleted. Please contact support.'
+        });
+    }
+    
+    // Serve the file
+    res.sendFile(filepath, (err) => {
+        if (err) {
+            console.error(`❌ Error serving document ${filename}:`, err.message);
+            res.status(500).json({ error: 'Failed to serve document' });
+        } else {
+            console.log(`✅ Document served: ${filename}`);
+        }
+    });
+});
+
 // ─── Routes ────────────────────────────────────────────────────
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/reports', require('./routes/reports'));
