@@ -237,4 +237,72 @@ router.post('/regenerate-documents', auth, async (req, res) => {
     }
 });
 
+// POST /regenerate-all-documents — Admin endpoint to regenerate all missing documents
+router.post('/regenerate-all-documents', auth, async (req, res) => {
+    try {
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser || currentUser.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+
+        console.log('🔄 Admin triggered: Regenerating all missing documents...');
+        
+        const usersWithProjects = await User.find({
+            selectedProject: { $ne: null },
+            paymentStatus: 'paid'
+        }).populate('selectedProject');
+        
+        const results = {
+            processed: 0,
+            offerLettersGenerated: 0,
+            certificatesGenerated: 0,
+            errors: []
+        };
+        
+        for (const user of usersWithProjects) {
+            const project = user.selectedProject;
+            let updated = false;
+            results.processed++;
+            
+            try {
+                // Generate offer letter if user has selected project
+                if (user.selectedProject) {
+                    const offerLetterPath = await generateOfferLetter(user, project);
+                    user.offerLetterUrl = offerLetterPath;
+                    results.offerLettersGenerated++;
+                    updated = true;
+                }
+                
+                // Generate certificate if course is completed
+                if (user.courseCompleted) {
+                    const { generateCertificate } = require('../services/documentService');
+                    const certificatePath = await generateCertificate(user, project);
+                    user.certificateUrl = certificatePath;
+                    results.certificatesGenerated++;
+                    updated = true;
+                }
+                
+                if (updated) {
+                    await user.save();
+                }
+                
+            } catch (userError) {
+                results.errors.push(`${user.email}: ${userError.message}`);
+            }
+        }
+        
+        console.log(`✅ Regeneration complete: ${results.offerLettersGenerated} offer letters, ${results.certificatesGenerated} certificates`);
+        
+        res.json({
+            success: true,
+            message: 'Document regeneration completed',
+            results
+        });
+        
+    } catch (err) {
+        console.error('Document regeneration error:', err.message);
+        res.status(500).json({ error: 'Failed to regenerate documents' });
+    }
+});
+
 module.exports = router;

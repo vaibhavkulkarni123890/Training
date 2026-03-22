@@ -85,8 +85,72 @@ if (!process.env.MONGODB_URI) {
 }
 
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
+    .then(async () => {
         console.log('✅ MongoDB Connected');
+        
+        // Regenerate missing documents on startup
+        try {
+            const User = require('./models/User');
+            const Project = require('./models/Project');
+            const { generateOfferLetter, generateCertificate } = require('./services/documentService');
+            
+            console.log('🔄 Checking for users with missing documents...');
+            
+            const usersWithProjects = await User.find({
+                selectedProject: { $ne: null },
+                paymentStatus: 'paid',
+                $or: [
+                    { offerLetterUrl: { $exists: true, $ne: '' } },
+                    { certificateUrl: { $exists: true, $ne: '' } }
+                ]
+            }).populate('selectedProject');
+            
+            let regeneratedCount = 0;
+            
+            for (const user of usersWithProjects) {
+                const project = user.selectedProject;
+                let updated = false;
+                
+                // Check if offer letter file exists
+                if (user.offerLetterUrl) {
+                    const offerPath = require('path').join(__dirname, 'documents', user.offerLetterUrl.replace('/documents/', ''));
+                    if (!require('fs').existsSync(offerPath)) {
+                        console.log(`📄 Regenerating offer letter for ${user.email}`);
+                        const newOfferPath = await generateOfferLetter(user, project);
+                        user.offerLetterUrl = newOfferPath;
+                        updated = true;
+                        regeneratedCount++;
+                    }
+                }
+                
+                // Check if certificate file exists
+                if (user.certificateUrl && user.courseCompleted) {
+                    const certPath = require('path').join(__dirname, 'documents', user.certificateUrl.replace('/documents/', ''));
+                    if (!require('fs').existsSync(certPath)) {
+                        console.log(`🏆 Regenerating certificate for ${user.email}`);
+                        const newCertPath = await generateCertificate(user, project);
+                        user.certificateUrl = newCertPath;
+                        updated = true;
+                        regeneratedCount++;
+                    }
+                }
+                
+                if (updated) {
+                    await user.save();
+                }
+            }
+            
+            if (regeneratedCount > 0) {
+                console.log(`✅ Regenerated ${regeneratedCount} documents on startup`);
+            } else {
+                console.log('✅ All documents are present');
+            }
+            
+        } catch (docError) {
+            console.error('⚠️ Document regeneration error:', docError.message);
+            // Don't block server startup if document regeneration fails
+        }
+        
         startEmailReminders();
         app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
     })
