@@ -4,52 +4,158 @@ dotenv.config();
 
 const Project = require('./models/Project');
 
-const generateRoadmap = (cat) => {
-    const roadmaps = {
+const generateRoadmap = (category, estimatedWeeks) => {
+    const phaseTemplates = {
         'Web Development': [
-            { step: "Phase 1: Environment & UI Setup", description: "Initialize the React/Next.js project, install dependencies, and build the basic layout/navigation." },
-            { step: "Phase 2: Database & API Design", description: "Design the MongoDB models and create Express REST API endpoints for data handling." },
-            { step: "Phase 3: Business Logic Implementation", description: "Develop the core features, state management (Redux/Context), and component interactions." },
-            { step: "Phase 4: Authentication & Security", description: "Integrate JWT authentication, secure routes, and implement input validation." },
-            { step: "Phase 5: Data Persistence & Final Polish", description: "Connect all frontend-backend flows, refine UI/UX, and perform thorough testing." }
+            { title: "Environment & UI Setup", description: "Initialize the React/Next.js project, install dependencies, and build the basic layout/navigation." },
+            { title: "Database & API Design", description: "Design the MongoDB models and create Express REST API endpoints for data handling." },
+            { title: "Authentication System", description: "Implement user registration, login, JWT authentication, and secure route protection." },
+            { title: "Core Feature Development", description: "Build the main application features and business logic components." },
+            { title: "State Management", description: "Implement Redux/Context API for global state management and data flow." },
+            { title: "API Integration", description: "Connect frontend components with backend APIs and handle data operations." },
+            { title: "User Interface Polish", description: "Enhance UI/UX design, add responsive layouts, and improve user interactions." },
+            { title: "Advanced Features", description: "Implement advanced functionality like real-time updates, notifications, or third-party integrations." },
+            { title: "Payment Integration", description: "Integrate payment gateways, handle transactions, and implement billing logic." },
+            { title: "Admin Dashboard", description: "Build administrative interfaces for content management and system monitoring." },
+            { title: "Performance Optimization", description: "Optimize application performance, implement caching, and reduce load times." },
+            { title: "Security Hardening", description: "Implement security best practices, input validation, and vulnerability fixes." },
+            { title: "Testing & Quality Assurance", description: "Write unit tests, integration tests, and perform comprehensive testing." },
+            { title: "Deployment Preparation", description: "Configure production environment, set up CI/CD, and prepare deployment scripts." },
+            { title: "Documentation & Handover", description: "Create technical documentation, user guides, and project handover materials." },
+            { title: "Final Testing & Launch", description: "Perform final testing, bug fixes, and deploy the application to production." },
+            { title: "Post-Launch Support", description: "Monitor application performance, handle user feedback, and implement minor improvements." },
+            { title: "Feature Enhancements", description: "Add additional features based on user requirements and feedback." },
+            { title: "Scalability Improvements", description: "Implement scalability solutions and performance monitoring systems." },
+            { title: "Maintenance & Updates", description: "Regular maintenance, security updates, and feature refinements." }
         ],
         'Mobile Development': [
-            { step: "Phase 1: UI Kit & Navigation", description: "Set up the React Native environment and design the mobile screens using UI libraries." },
-            { step: "Phase 2: Local Storage & State", description: "Implement local data persistence (AsyncStorage/SQLite) and global state management." },
-            { step: "Phase 3: API Integration", description: "Connect the mobile app to backend services and handle real-time data or notifications." },
-            { step: "Phase 4: Native Features", description: "Implement camera, GPS, or other native device features required for the project." },
-            { step: "Phase 5: Performance & Deployment", description: "Optimize app performance, handle edge cases, and prepare for build generation." }
+            { title: "UI Kit & Navigation", description: "Set up the React Native environment and design the mobile screens using UI libraries." },
+            { title: "Local Storage & State", description: "Implement local data persistence (AsyncStorage/SQLite) and global state management." },
+            { title: "User Authentication", description: "Build login/registration screens with biometric authentication and secure token storage." },
+            { title: "Core App Features", description: "Develop the main application functionality and user interaction flows." },
+            { title: "API Integration", description: "Connect the mobile app to backend services and handle real-time data synchronization." },
+            { title: "Native Features", description: "Implement camera, GPS, push notifications, or other native device features." },
+            { title: "Offline Functionality", description: "Add offline support, data caching, and sync mechanisms for poor connectivity." },
+            { title: "Push Notifications", description: "Implement push notification system with Firebase/OneSignal integration." },
+            { title: "Social Features", description: "Add social login, sharing capabilities, and user interaction features." },
+            { title: "Media Handling", description: "Implement image/video upload, processing, and gallery functionality." },
+            { title: "Performance Optimization", description: "Optimize app performance, reduce bundle size, and improve loading times." },
+            { title: "Platform-Specific Features", description: "Implement iOS/Android specific features and platform optimizations." },
+            { title: "Testing & Debugging", description: "Perform device testing, debug platform-specific issues, and optimize performance." },
+            { title: "App Store Preparation", description: "Prepare app store listings, screenshots, and submission requirements." },
+            { title: "Beta Testing", description: "Deploy beta versions, gather user feedback, and implement improvements." },
+            { title: "Production Build", description: "Generate production builds, configure app signing, and prepare for release." },
+            { title: "App Store Deployment", description: "Submit to app stores, handle review process, and manage release." },
+            { title: "Post-Launch Monitoring", description: "Monitor app performance, crash reports, and user analytics." },
+            { title: "User Feedback Integration", description: "Implement user feedback, add requested features, and fix reported issues." },
+            { title: "Maintenance & Updates", description: "Regular updates, security patches, and feature enhancements." }
         ],
         'AI/ML': [
-            { step: "Phase 1: Data Collection & Cleaning", description: "Gather the required datasets and perform exploratory data analysis (EDA) and preprocessing." },
-            { step: "Phase 2: Model Selection & Training", description: "Choose appropriate ML/DL architectures and train the model using training/validation sets." },
-            { step: "Phase 3: Model Evaluation & Tuning", description: "Evaluate performance using metrics (Accuracy/F1) and fine-tune hyperparameters." },
-            { step: "Phase 4: API & Integration", description: "Create a Flask/FastAPI wrapper to serve the model as a usable REST API." },
-            { step: "Phase 5: Frontend Dashboard", description: "Build a web interface to allow users to interact with the model and visualize results." }
+            { title: "Data Collection & Cleaning", description: "Gather the required datasets and perform exploratory data analysis (EDA) and preprocessing." },
+            { title: "Data Exploration & Analysis", description: "Perform statistical analysis, identify patterns, and understand data characteristics." },
+            { title: "Feature Engineering", description: "Create relevant features, handle missing values, and prepare data for modeling." },
+            { title: "Model Selection & Architecture", description: "Choose appropriate ML/DL architectures and design the model structure." },
+            { title: "Model Training & Validation", description: "Train the model using training/validation sets and implement cross-validation." },
+            { title: "Hyperparameter Tuning", description: "Optimize model parameters using grid search, random search, or Bayesian optimization." },
+            { title: "Model Evaluation & Testing", description: "Evaluate performance using metrics (Accuracy/F1) and test on unseen data." },
+            { title: "Model Interpretation", description: "Implement model explainability techniques and analyze feature importance." },
+            { title: "API Development", description: "Create a Flask/FastAPI wrapper to serve the model as a usable REST API." },
+            { title: "Model Deployment", description: "Deploy the model to cloud platforms and set up serving infrastructure." },
+            { title: "Frontend Dashboard", description: "Build a web interface to allow users to interact with the model and visualize results." },
+            { title: "Monitoring & Logging", description: "Implement model monitoring, performance tracking, and prediction logging." },
+            { title: "A/B Testing Setup", description: "Set up A/B testing framework to compare model versions and performance." },
+            { title: "Model Optimization", description: "Optimize model inference speed, memory usage, and deployment efficiency." },
+            { title: "Data Pipeline Automation", description: "Automate data preprocessing, feature engineering, and model retraining pipelines." },
+            { title: "Production Testing", description: "Test model performance in production environment and handle edge cases." },
+            { title: "Documentation & Reporting", description: "Create technical documentation, model cards, and performance reports." },
+            { title: "Model Maintenance", description: "Monitor model drift, retrain when necessary, and maintain model performance." },
+            { title: "Feature Enhancement", description: "Add new features, improve model accuracy, and expand functionality." },
+            { title: "Scalability & Performance", description: "Scale model serving, optimize for high throughput, and improve response times." }
         ],
         'Cybersecurity': [
-            { step: "Phase 1: Research & Scope", description: "Define the security objective, research known vulnerabilities (OWASP), and set up the lab." },
-            { step: "Phase 2: Tool/Script Development", description: "Develop scripts for network scanning, packet analysis, or encryption using Python/Node." },
-            { step: "Phase 3: Vulnerability Analysis", description: "Implement logic to detect attack patterns or perform automated security checks." },
-            { step: "Phase 4: Security Hardening", description: "Develop defensive mechanisms like rule engines, firewalls, or secure key management." },
-            { step: "Phase 5: Logging & Reporting", description: "Implement detailed security audit logs and generate professional vulnerability reports." }
+            { title: "Research & Scope Definition", description: "Define the security objective, research known vulnerabilities (OWASP), and set up the lab environment." },
+            { title: "Threat Modeling", description: "Identify potential threats, attack vectors, and create comprehensive threat models." },
+            { title: "Tool/Script Development", description: "Develop scripts for network scanning, packet analysis, or encryption using Python/Node." },
+            { title: "Vulnerability Assessment", description: "Implement logic to detect attack patterns or perform automated security checks." },
+            { title: "Security Testing Framework", description: "Build automated security testing tools and vulnerability scanning capabilities." },
+            { title: "Penetration Testing", description: "Conduct controlled penetration testing and document security weaknesses." },
+            { title: "Security Hardening", description: "Develop defensive mechanisms like rule engines, firewalls, or secure key management." },
+            { title: "Incident Response System", description: "Create incident detection, response procedures, and automated alert systems." },
+            { title: "Encryption Implementation", description: "Implement strong encryption protocols, key management, and secure communication." },
+            { title: "Access Control Systems", description: "Build role-based access control, authentication, and authorization mechanisms." },
+            { title: "Security Monitoring", description: "Implement continuous security monitoring, log analysis, and threat detection." },
+            { title: "Compliance Framework", description: "Ensure compliance with security standards (ISO 27001, NIST, etc.)." },
+            { title: "Security Audit Tools", description: "Develop automated security audit tools and compliance checking systems." },
+            { title: "Forensics Capabilities", description: "Implement digital forensics tools for incident investigation and evidence collection." },
+            { title: "Security Training Module", description: "Create security awareness training and phishing simulation systems." },
+            { title: "Logging & Reporting", description: "Implement detailed security audit logs and generate professional vulnerability reports." },
+            { title: "Security Dashboard", description: "Build comprehensive security dashboard with real-time threat visualization." },
+            { title: "Integration Testing", description: "Test security integrations, validate defense mechanisms, and verify protection levels." },
+            { title: "Documentation & Procedures", description: "Create security procedures, incident response playbooks, and technical documentation." },
+            { title: "Maintenance & Updates", description: "Regular security updates, threat intelligence integration, and system maintenance." }
         ],
         'Data Engineering': [
-            { step: "Phase 1: Source Identification", description: "Identify data sources (APIs/Files/DBs) and design the ingestion architecture." },
-            { step: "Phase 2: Data Ingestion Pipeline", description: "Build automated scripts to ingest data into a central storage (PostgreSQL/MongoDB)." },
-            { step: "Phase 3: Transformation Logic (ETL)", description: "Implement cleaning, normalization, and transformation logic using Python/SQL." },
-            { step: "Phase 4: Quality Monitoring", description: "Implement automated data quality checks (nulls, types, range) and data lineage." },
-            { step: "Phase 5: Visualization & API", description: "Expose the processed data via REST APIs and build an analytics dashboard." }
+            { title: "Source Identification & Analysis", description: "Identify data sources (APIs/Files/DBs) and analyze data structure and quality." },
+            { title: "Architecture Design", description: "Design the data pipeline architecture, storage solutions, and processing frameworks." },
+            { title: "Data Ingestion Pipeline", description: "Build automated scripts to ingest data from various sources into central storage." },
+            { title: "Data Validation & Quality", description: "Implement data quality checks, validation rules, and error handling mechanisms." },
+            { title: "Transformation Logic (ETL)", description: "Implement cleaning, normalization, and transformation logic using Python/SQL." },
+            { title: "Data Storage Optimization", description: "Optimize data storage, implement partitioning, and design efficient schemas." },
+            { title: "Real-time Processing", description: "Implement stream processing for real-time data ingestion and transformation." },
+            { title: "Data Catalog & Lineage", description: "Build data catalog, track data lineage, and implement metadata management." },
+            { title: "Quality Monitoring", description: "Implement automated data quality monitoring, anomaly detection, and alerting." },
+            { title: "Performance Optimization", description: "Optimize pipeline performance, implement caching, and reduce processing time." },
+            { title: "Scheduling & Orchestration", description: "Implement workflow scheduling, dependency management, and pipeline orchestration." },
+            { title: "Error Handling & Recovery", description: "Build robust error handling, retry mechanisms, and data recovery procedures." },
+            { title: "Security & Compliance", description: "Implement data security, encryption, access controls, and compliance measures." },
+            { title: "Monitoring & Alerting", description: "Set up comprehensive monitoring, logging, and alerting for pipeline health." },
+            { title: "Visualization & API", description: "Expose the processed data via REST APIs and build analytics dashboards." },
+            { title: "Testing & Validation", description: "Implement data pipeline testing, validation frameworks, and quality assurance." },
+            { title: "Documentation & Training", description: "Create technical documentation, user guides, and team training materials." },
+            { title: "Scalability Implementation", description: "Implement auto-scaling, load balancing, and high-availability solutions." },
+            { title: "Performance Tuning", description: "Fine-tune performance, optimize resource usage, and improve efficiency." },
+            { title: "Maintenance & Support", description: "Ongoing maintenance, updates, and support for data pipeline operations." }
         ],
         'DevOps': [
-            { step: "Phase 1: Infrastructure Analysis", description: "Analyze the application requirements and design the CI/CD or monitoring architecture." },
-            { step: "Phase 2: Containerization & Config", description: "Create Dockerfiles and configure environment variables/secrets for the services." },
-            { step: "Phase 3: Pipeline Automation", description: "Build automated CI/CD pipelines (GitHub Actions/Ansible) for builds and tests." },
-            { step: "Phase 4: Monitoring & Alerting", description: "Implement health checks, resource monitoring (Prometheus), and alert triggers." },
-            { step: "Phase 5: Scaling & Reliability", description: "Develop rollback strategies, auto-scaling logic, or performance dashboards." }
+            { title: "Infrastructure Analysis", description: "Analyze the application requirements and design the CI/CD or monitoring architecture." },
+            { title: "Environment Setup", description: "Set up development, staging, and production environments with proper configurations." },
+            { title: "Containerization & Config", description: "Create Dockerfiles and configure environment variables/secrets for the services." },
+            { title: "Version Control & Branching", description: "Implement Git workflows, branching strategies, and code review processes." },
+            { title: "CI/CD Pipeline Development", description: "Build automated CI/CD pipelines (GitHub Actions/Jenkins) for builds and deployments." },
+            { title: "Testing Automation", description: "Implement automated testing pipelines, unit tests, integration tests, and quality gates." },
+            { title: "Infrastructure as Code", description: "Implement IaC using Terraform/CloudFormation for reproducible infrastructure." },
+            { title: "Monitoring & Alerting", description: "Implement health checks, resource monitoring (Prometheus), and alert triggers." },
+            { title: "Logging & Observability", description: "Set up centralized logging, distributed tracing, and observability tools." },
+            { title: "Security Integration", description: "Implement security scanning, vulnerability assessment, and compliance checks." },
+            { title: "Database Management", description: "Automate database deployments, migrations, and backup/recovery procedures." },
+            { title: "Load Balancing & Scaling", description: "Implement load balancers, auto-scaling policies, and high-availability solutions." },
+            { title: "Performance Optimization", description: "Optimize application performance, implement caching, and resource optimization." },
+            { title: "Disaster Recovery", description: "Implement backup strategies, disaster recovery plans, and business continuity." },
+            { title: "Configuration Management", description: "Implement configuration management, secret management, and environment parity." },
+            { title: "Scaling & Reliability", description: "Develop rollback strategies, auto-scaling logic, and performance dashboards." },
+            { title: "Cost Optimization", description: "Implement cost monitoring, resource optimization, and budget management." },
+            { title: "Documentation & Runbooks", description: "Create operational documentation, runbooks, and troubleshooting guides." },
+            { title: "Team Training & Handover", description: "Train team members, create knowledge transfer, and establish operational procedures." },
+            { title: "Continuous Improvement", description: "Implement feedback loops, performance metrics, and continuous improvement processes." }
         ]
     };
-    return roadmaps[cat] || roadmaps['Web Development'];
+
+    const templates = phaseTemplates[category] || phaseTemplates['Web Development'];
+    const phases = [];
+    
+    // Generate phases based on estimated weeks
+    for (let i = 0; i < estimatedWeeks; i++) {
+        const phaseNumber = i + 1;
+        const templateIndex = i % templates.length;
+        const template = templates[templateIndex];
+        
+        phases.push({
+            step: `Phase ${phaseNumber}: ${template.title}`,
+            description: template.description
+        });
+    }
+    
+    return phases;
 };
 
 const projects = [
@@ -143,7 +249,7 @@ async function seed() {
         // Insert all projects
         const projectsWithRoadmaps = projects.map(p => ({
             ...p,
-            roadmap: generateRoadmap(p.category)
+            roadmap: generateRoadmap(p.category, p.estimatedWeeks)
         }));
         const result = await Project.insertMany(projectsWithRoadmaps);
         console.log(`✅ Seeded ${result.length} projects successfully!`);

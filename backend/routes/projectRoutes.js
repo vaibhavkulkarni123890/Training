@@ -98,4 +98,90 @@ router.post('/select', auth, async (req, res) => {
     }
 });
 
+// GET /my-project — Get user's selected project with current phase info
+router.get('/my-project', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate('selectedProject');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        
+        if (!user.selectedProject) {
+            return res.status(404).json({ error: 'No project selected' });
+        }
+
+        const project = user.selectedProject;
+        const currentWeek = user.currentWeek || 1;
+        
+        // Prepare roadmap with current phase highlighted
+        const roadmapWithStatus = project.roadmap.map((phase, index) => {
+            const phaseNumber = index + 1;
+            let status = 'locked';
+            
+            if (phaseNumber < currentWeek) {
+                status = 'completed';
+            } else if (phaseNumber === currentWeek) {
+                status = 'current';
+            }
+            
+            return {
+                ...phase.toObject(),
+                phaseNumber,
+                status,
+                // Only show detailed description for current phase
+                description: phaseNumber === currentWeek ? phase.description : ''
+            };
+        });
+
+        res.json({
+            project: {
+                ...project.toObject(),
+                roadmap: roadmapWithStatus
+            },
+            currentWeek,
+            totalWeeks: project.estimatedWeeks,
+            progress: Math.round((currentWeek / project.estimatedWeeks) * 100)
+        });
+    } catch (err) {
+        console.error('Get my project error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch project' });
+    }
+});
+
+// POST /advance-week — Advance to next week/phase (for testing or admin)
+router.post('/advance-week', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate('selectedProject');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        
+        if (!user.selectedProject) {
+            return res.status(400).json({ error: 'No project selected' });
+        }
+
+        const currentWeek = user.currentWeek || 1;
+        const totalWeeks = user.selectedProject.estimatedWeeks;
+        
+        if (currentWeek >= totalWeeks) {
+            return res.status(400).json({ error: 'Project already completed' });
+        }
+
+        user.currentWeek = currentWeek + 1;
+        
+        // Mark course as completed if reached final week
+        if (user.currentWeek >= totalWeeks) {
+            user.courseCompleted = true;
+        }
+        
+        await user.save();
+
+        res.json({
+            success: true,
+            message: `Advanced to week ${user.currentWeek}`,
+            currentWeek: user.currentWeek,
+            courseCompleted: user.courseCompleted
+        });
+    } catch (err) {
+        console.error('Advance week error:', err.message);
+        res.status(500).json({ error: 'Failed to advance week' });
+    }
+});
+
 module.exports = router;

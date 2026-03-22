@@ -29,6 +29,7 @@ const UserSchema = new mongoose.Schema({
         default: null
     },
     projectLockedAt: { type: Date, default: null },
+    currentWeek: { type: Number, default: 1 }, // Track current week/phase of the project
     courseCompleted: { type: Boolean, default: false },
     offerLetterUrl: { type: String, default: '' },
     certificateUrl: { type: String, default: '' },
